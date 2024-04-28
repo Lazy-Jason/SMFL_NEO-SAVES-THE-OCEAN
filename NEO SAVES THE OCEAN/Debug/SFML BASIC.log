@@ -1,0 +1,5 @@
+﻿  SFML BASIC.cpp
+C:\Users\hunti\OneDrive\Documents\Cpp Projects\SFML BASIC\SFML BASIC\SFML BASIC.cpp(23,22): error C2065: 'default': undeclared identifier
+C:\Users\hunti\OneDrive\Documents\Cpp Projects\SFML BASIC\SFML BASIC\SFML BASIC.cpp(23,22): error C2131: expression did not evaluate to a constant
+C:\Users\hunti\OneDrive\Documents\Cpp Projects\SFML BASIC\SFML BASIC\SFML BASIC.cpp(23,22): message : a non-constant (sub-)expression was encountered
+C:\Users\hunti\OneDrive\Documents\Cpp Projects\SFML BASIC\SFML BASIC\SFML BASIC.cpp(23,17): error C2051: case expression not constant
