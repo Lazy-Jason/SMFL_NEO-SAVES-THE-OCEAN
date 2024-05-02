@@ -4,8 +4,8 @@
 #include <SFML/Graphics.hpp>
 
 
-#define TEXTURE_PATH "D:\\\\SMFL_NEO-SAVES-THE-OCEAN\\\\Textures\\\\"
-#define FONT_PATH "D:\\\\SMFL_NEO-SAVES-THE-OCEAN\\\\Fonts\\\\"
+#define TEXTURE_PATH "C:\\\\Users\\\\hunti\\\\OneDrive\\\\Documents\\\\Cpp Projects\\\\NEO SAVES THE OCEAN\\\\Textures\\\\"
+#define FONT_PATH "C:\\\\Users\\\\hunti\\\\OneDrive\\\\Documents\\\\Cpp Projects\\\\NEO SAVES THE OCEAN\\\\Fonts\\\\"
 
 /**
  * @brief The base class for all drawable objects in the application.
