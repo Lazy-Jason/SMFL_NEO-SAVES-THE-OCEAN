@@ -37,6 +37,7 @@ LObject* LMenu_Hud::GetMenuByIndex(int Index)
         default:
             std::cout << "Out Of Range Index: Index Stops At 2 \n";
     }
+    return nullptr;
 }
 
 void LMenu_Hud::SetActiveWindowByIndex(int Index)

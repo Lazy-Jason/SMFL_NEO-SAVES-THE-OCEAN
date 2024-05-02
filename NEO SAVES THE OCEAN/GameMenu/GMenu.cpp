@@ -17,6 +17,11 @@ void GMenu::SetBackgroundTexture(const sf::Texture& NewTexture, sf::Uint8 Opacit
 
 void GMenu::ScaleBackgroundSprite()
 {
+    /*if (const GEngine* GameInstance = &GEngine::GetInstance())
+    {
+        printf("The size of the window is %d : %d \n", GameInstance->GetGameWindowSize().x, GameInstance->GetGameWindowSize().y);
+    }*/
+    
     // Get the size of the game window
     const sf::Vector2u windowSize = {1920, 1080};
     // Check if the window size and background sprite dimensions are valid

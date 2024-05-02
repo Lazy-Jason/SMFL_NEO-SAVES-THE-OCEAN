@@ -5,7 +5,7 @@ int main()
     // Create a new GEngine instance
     GEngine GameEngine(1920, 1080, "Neo Saves The Ocean");
 
-    while (GameEngine.GetGameWindowOpen())
+    while (GameEngine.IsGameWindowOpen())
     {
         // Update the game loop
         GameEngine.UpdateGame();

@@ -1,119 +1,132 @@
 // GEngine.cpp
 #include "GEngine.h"
+#include "../GameMenu/MainMenu/LMenu_Hud.h"
+#include "../GameMenu/MainMenu/LMainMenu_Screen.h"
 
-// Initialize the static member variable
-GEngine* GEngine::Instance = nullptr;  // Global instance of the GEngine class
+std::unique_ptr<GEngine> GEngine::Instance = nullptr;
 
-// Constructor
-GEngine::GEngine(int WindowWidth_px, int WindowHeight_px, sf::String GameWindowTitle)
+GEngine::GEngine(int WindowWidth_px, int WindowHeight_px, const std::string& GameWindowTitle)
+:GameVideoMode(WindowWidth_px, WindowHeight_px), MenuHud(std::make_unique<LMenu_Hud>()), MainMenuScreen(std::make_unique<LMainMenu_Screen>())
 {
-    this->GameWindowSize.x = WindowWidth_px;  // Set the game window width
-    this->GameWindowSize.y = WindowHeight_px;  // Set the game window height
-    this->GameWindowTitle = GameWindowTitle;  // Set the game window title
-    this->GameVideoMode = sf::VideoMode(GameWindowSize.x, GameWindowSize.y);  // Set the video mode
-    InitWindow();  // Initialize the game window
+    this->GameWindowSize = {static_cast<unsigned>(WindowWidth_px), static_cast<unsigned>(WindowHeight_px)};
+    this->GameWindowTitle = GameWindowTitle;
+    InitWindow();
 }
 
-// Destructor
-GEngine::~GEngine()
-{
-    delete GameWindow;  // Delete the game window
-    delete Instance;  // Delete the instance of the GEngine class
-}
+GEngine::~GEngine() = default;
 
-// Get the instance of the GEngine class
 GEngine& GEngine::GetInstance()
 {
+    if (!Instance)
+    {
+        Instance = std::make_unique<GEngine>();
+    }
     return *Instance;
 }
 
-// Initialize the game window
-void GEngine::InitWindow()
+void GEngine::SetCurrentGameLevelState(GameLevelState state)
 {
-    // Create the game window
-    this->GameWindow = new sf::RenderWindow(GameVideoMode, GameWindowTitle, sf::Style::Close | sf::Style::Titlebar | sf::Style::Resize); 
+    CurrentGameLevelState = state;
 }
 
-// Update the game logic
+void GEngine::UpdateGame()
+{
+    UpdateGamePoolEvents();
+    UpdateGameLogic();
+
+    // Call registered update functions
+    for (const auto& updateFunction : UpdateFunctions)
+    {
+        updateFunction();
+    }
+}
+
+void GEngine::RenderGame() const
+{
+    GameWindow->clear(sf::Color(190, 190, 190));
+    RenderMenuHUD(); 
+
+    // Call registered render functions
+    for (const auto& renderFunction : RenderFunctions)
+    {
+        renderFunction();
+    }
+
+    GameWindow->display();
+}
+
+void GEngine::RegisterUpdateFunction(const std::function<void()>& updateFunction)
+{
+    UpdateFunctions.push_back(updateFunction);
+}
+
+void GEngine::RegisterRenderFunction(const std::function<void()>& renderFunction)
+{
+    RenderFunctions.push_back(renderFunction);
+}
+
+void GEngine::InitWindow()
+{
+    GameWindow = new sf::RenderWindow(GameVideoMode, GameWindowTitle, sf::Style::Close | sf::Style::Titlebar | sf::Style::Resize);
+}
+
 void GEngine::UpdateGameLogic()
 {
     // Add your game logic update code here
 }
 
-// Update the game pool events
+void GEngine::RenderMenuHUD() const
+{
+    MenuHud->DrawToWindow(*GameWindow);
+}
+
+void GEngine::RecalculateMouseMove() const
+{
+    switch (CurrentGameLevelState)
+    {
+    case GameLevelState::Menu_Level:
+        MenuHud->OnMouseButtonMove(*GameWindow);
+        break;
+    case GameLevelState::GameLevel:
+        // Handle mouse move in the game level
+        break;
+    }
+}
+
+void GEngine::RecalculateMousePressed() const
+{
+    switch (CurrentGameLevelState)
+    {
+    case GameLevelState::Menu_Level:
+        MenuHud->OnMouseButtonAction(sf::Mouse::Left);
+        MenuHud->OnMouseButtonAction(sf::Mouse::Right);
+        break;
+    case GameLevelState::GameLevel:
+        // Handle mouse button press in the game level
+            break;
+    }
+}
+
 void GEngine::UpdateGamePoolEvents()
 {
     while (GameWindow->pollEvent(GameWindowEvent))
-    {  // Poll events from the game window
+    {
         switch (GameWindowEvent.type)
         {
-            case sf::Event::Closed:
-                // Close the game window
+        case sf::Event::Closed:
+            GameWindow->close();
+            break;
+        case sf::Event::KeyReleased:
+            if (GameWindowEvent.key.code == sf::Keyboard::Escape)
                 GameWindow->close();
-                break;
-            case sf::Event::KeyReleased:
-                if (GameWindowEvent.key.code == sf::Keyboard::Escape)
-                    // Close the game window if the Escape key is released
-                    GameWindow->close();
-                break;
-            case sf::Event::MouseMoved:
-                // Recalculate mouse move
-                RecalculateMouseMove();
-                break;
-            case sf::Event::MouseButtonPressed:
-                // Recalculate mouse button pressed
-                RecalculateMousePressed();
-                break;
+            break;
+        case sf::Event::MouseMoved:
+            RecalculateMouseMove();
+            break;
+        case sf::Event::MouseButtonPressed:
+            RecalculateMousePressed();
+            break;
+        default: ;
         }
     }
-}
-
-// Update the game
-void GEngine::UpdateGame()
-{
-    UpdateGamePoolEvents();  // Update the game pool events
-    // Add other game loop update code here
-}
-
-// Render the menu HUD
-void GEngine::RenderMenuHUD()
-{
-    Menu_Hud.DrawToWindow(*GameWindow);  // Draw the menu HUD to the game window
-}
-
-// Recalculate mouse move
-void GEngine::RecalculateMouseMove()
-{
-    switch (Current_GameLeveState)
-    {
-        case GameLevelState::Menu_Level:
-            Menu_Hud.OnMouseButtonMove(*GameWindow);  // Handle mouse move in the menu level
-            break;
-        case GameLevelState::GameLevel:
-            // Handle mouse move in the game level
-            break;
-    }
-}
-
-// Recalculate mouse button pressed
-void GEngine::RecalculateMousePressed()
-{
-    switch (Current_GameLeveState)
-    {
-        case GameLevelState::Menu_Level:
-            Menu_Hud.OnMouseButtonAction(sf::Mouse::Left);  // Handle left mouse button press in the menu level
-            Menu_Hud.OnMouseButtonAction(sf::Mouse::Right);  // Handle right mouse button press in the menu level
-            break;
-        case GameLevelState::GameLevel:
-            // Handle mouse button press in the game level
-            break;
-    }
-}
-
-// Render the game
-void GEngine::RenderGame()
-{
-    GameWindow->clear(sf::Color(110.0f, 110.0f, 110.0f));  // Clear the game window with a light gray color
-    RenderMenuHUD();  // Render the menu HUD
-    GameWindow->display();  // Display the game window
 }
