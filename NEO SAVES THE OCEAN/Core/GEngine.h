@@ -43,6 +43,13 @@ public:
      */
     static GEngine& GetInstance();
 
+    static GEngine& Build(int WindowWidth_px, int WindowHeight_px, const std::string& GameWindowTitle);
+
+    /**
+    * @brief Initializes the game window.
+    */
+    void InitWindow();
+ 
     /**
      * @brief Returns a reference to the game window.
      * @return A reference to the game window.
@@ -131,11 +138,9 @@ public:
      */
     void RegisterRenderFunction(const std::function<void()>& renderFunction);
 
+ 
+
 private:
-    /**
-     * @brief Initializes the game window.
-     */
-    void InitWindow();
 
     /**
      * @brief Updates the game logic.
@@ -168,12 +173,12 @@ private:
     std::string GameWindowTitle;             ///< The title of the game window.
     sf::Vector2u GameWindowSize;             ///< The size of the game window.
     sf::Font MenuFont;                       ///< The font used for the menu.
-    std::unique_ptr<LMenu_Hud> MenuHud;      ///< The menu HUD object.
-    std::unique_ptr<LMainMenu_Screen> MainMenuScreen; ///< The main menu screen object.
+    LMenu_Hud* MenuHud;      ///< The menu HUD object.
+    LMainMenu_Screen* MainMenuScreen; ///< The main menu screen object.
     GameLevelState CurrentGameLevelState = GameLevelState::Menu_Level; ///< The current game level state.
 
     std::vector<std::function<void()>> UpdateFunctions; ///< A vector of functions to be called during the game update loop.
     std::vector<std::function<void()>> RenderFunctions; ///< A vector of functions to be called during the game rendering process.
 
-    static std::unique_ptr<GEngine> Instance; ///< The singleton instance of the game engine.
+    static GEngine* Instance; ///< The singleton instance of the game engine.
 };

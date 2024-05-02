@@ -4,8 +4,6 @@
 #include <functional>
 #include "../../LObject.h"
 
-
-
 /**
  * @brief Represents a lazy button with customizable properties.
  */

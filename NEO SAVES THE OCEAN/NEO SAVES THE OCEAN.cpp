@@ -3,8 +3,9 @@
 int main()
 {
     // Create a new GEngine instance
-    GEngine GameEngine(1920, 1080, "Neo Saves The Ocean");
-
+    GEngine& GameEngine = GEngine::Build(1920, 1080, "Neo Saves The Ocean");
+    GameEngine.InitWindow();
+    
     while (GameEngine.IsGameWindowOpen())
     {
         // Update the game loop

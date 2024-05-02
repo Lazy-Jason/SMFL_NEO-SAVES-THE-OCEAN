@@ -3,23 +3,36 @@
 #include "../GameMenu/MainMenu/LMenu_Hud.h"
 #include "../GameMenu/MainMenu/LMainMenu_Screen.h"
 
-std::unique_ptr<GEngine> GEngine::Instance = nullptr;
+GEngine* GEngine::Instance = nullptr;
 
 GEngine::GEngine(int WindowWidth_px, int WindowHeight_px, const std::string& GameWindowTitle)
-:GameVideoMode(WindowWidth_px, WindowHeight_px), MenuHud(std::make_unique<LMenu_Hud>()), MainMenuScreen(std::make_unique<LMainMenu_Screen>())
+:GameVideoMode(WindowWidth_px, WindowHeight_px)
 {
     this->GameWindowSize = {static_cast<unsigned>(WindowWidth_px), static_cast<unsigned>(WindowHeight_px)};
     this->GameWindowTitle = GameWindowTitle;
-    InitWindow();
 }
 
 GEngine::~GEngine() = default;
 
+GEngine& GEngine::Build(int WindowWidth_px, int WindowHeight_px, const std::string& GameWindowTitle)
+{
+    if ( Instance != nullptr )
+    {
+        throw std::runtime_error("you are not allowed to build the engine twice!");
+    }
+    Instance = new GEngine(WindowWidth_px, WindowHeight_px, GameWindowTitle);
+    Instance->MenuHud = new LMenu_Hud();
+    Instance->MainMenuScreen = new LMainMenu_Screen();
+    return *Instance;
+}
+
+
 GEngine& GEngine::GetInstance()
 {
-    if (!Instance)
+    if (Instance == nullptr)
     {
-        Instance = std::make_unique<GEngine>();
+        throw std::runtime_error("engine was not started");
+        //Instance = new GEngine();
     }
     return *Instance;
 }
