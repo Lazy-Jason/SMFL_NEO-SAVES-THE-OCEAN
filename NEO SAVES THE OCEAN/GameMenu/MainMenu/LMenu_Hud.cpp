@@ -2,10 +2,13 @@
 #include <iostream>
 #include <functional>
 
+#include "../../Core/GEngine.h"
+#include "../../Core/Levels/Children/LFirstGame_Level.h"
+
 LMenu_Hud::LMenu_Hud():
 ExitModalMenu("Exit Game", "Are you sure you want to quit?")
 {
-    Main_Menu_Screen.OnPlay_ButtonReleasedEnvoy = [this] { SetActiveWindowByIndex(0); };
+    Main_Menu_Screen.OnPlay_ButtonReleasedEnvoy = [this] { OpenLevel(); };
     Main_Menu_Screen.OnOptions_ButtonReleasedEnvoy = [this] { SetActiveWindowByIndex(1); };
     Main_Menu_Screen.OnCredit_ButtonReleasedEnvoy = [this] { SetActiveWindowByIndex(2); };
     Main_Menu_Screen.OnExit_ButtonReleasedEnvoy = [this] { bIsConfirmingExit = true; };
@@ -13,7 +16,7 @@ ExitModalMenu("Exit Game", "Are you sure you want to quit?")
     Options_Menu_Screen.OnReturn_Button_Released = [this] { SetActiveWindowByIndex(0); };
     Credit_Menu_Screen.OnReturn_Button_Released = [this] { SetActiveWindowByIndex(0); };
     
-    ExitModalMenu.OnYes_Button_Released = [this] { if(GameWindowREF) GameWindowREF->close(); };
+    ExitModalMenu.OnYes_Button_Released = [this] { if(const GEngine* GameInstance = &GEngine::GetInstance()) GameInstance->GetGameWindow().close(); };
     ExitModalMenu.OnNo_Button_Released = [this] { bIsConfirmingExit = false; };
 }
 
@@ -49,7 +52,6 @@ void LMenu_Hud::SetActiveWindowByIndex(int Index)
 
 void LMenu_Hud::DrawToWindow(sf::RenderWindow& Render_Window)
 {
-    GameWindowREF = &Render_Window;
     GetActiveMenu()->DrawToWindow(Render_Window);
     if(bIsConfirmingExit)
     {
@@ -75,4 +77,10 @@ void LMenu_Hud::OnMouseButtonAction(sf::Mouse::Button MouseAction)
         return;
     }
     GetActiveMenu()->OnMouseButtonAction(MouseAction);
+}
+
+void LMenu_Hud::OpenLevel()
+{
+    printf("Entering a new level");
+    if(GEngine* Engine = &GEngine::GetInstance()) Engine->LoadLevel( new LFirstGame_Level() ); 
 }

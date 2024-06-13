@@ -2,6 +2,7 @@
 #include <iostream>
 #include <functional>
 #include <SFML/Graphics.hpp>
+#include "FunctionLibrary/LCoreStatic.h"
 
 
 #define TEXTURE_PATH "C:\\\\Users\\\\hunti\\\\OneDrive\\\\Documents\\\\Cpp Projects\\\\NEO SAVES THE OCEAN\\\\Textures\\\\"
@@ -37,6 +38,8 @@ public:
      * @param Render_Window The SFML render window to draw the object to.
      */
     virtual void DrawToWindow(sf::RenderWindow& Render_Window);
+
+    virtual void Update(float Delta_Time);
 
     /**
      * @brief Handles mouse movement events for the object.
@@ -77,9 +80,22 @@ public:
      */
     virtual bool IsMouseButtonOver(sf::RenderWindow& Render_Window) const { return false; }
 
+    virtual void OnKeyPressed( sf::Keyboard::Key InputKey );
+ 
+    virtual void OnKeyReleased( sf::Keyboard::Key InputKey );
+ 
     virtual void OnMouseButtonAction( sf::Mouse::Button MouseAction );
 
+    virtual void SetPosition( const sf::Vector2f& NewPosition );
+ 
+    virtual sf::Vector2f GetPosition() const { return {}; }
+ 
+    virtual void SetRotation( const float& Rotation );
+ 
+    virtual void SetScale( const sf::Vector2f& Scale );
+
     sf::Font& GetDefaultFont() { return Default_Font; }
+ 
     /**
     * @brief Sets the font of the button text.
     * @param NewFont The new font to set.

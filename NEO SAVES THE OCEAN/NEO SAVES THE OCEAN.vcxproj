@@ -79,6 +79,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <AdditionalOptions>/FS</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,10 +145,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\FunctionLibrary\LCoreStatic.cpp" />
     <ClCompile Include="Core\GEngine.cpp" />
+    <ClCompile Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LGameScreen_Layer.cpp" />
+    <ClCompile Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LHealthStat.cpp" />
+    <ClCompile Include="Core\LazyWidgets\GameUI\LGameHUD.cpp" />
+    <ClCompile Include="Core\LazyWidgets\GameUI\LProgressBar.cpp" />
     <ClCompile Include="Core\LazyWidgets\LazyEnvoyDeclaraction.cpp" />
+    <ClCompile Include="Core\Levels\Children\LFirstGame_Level.cpp" />
+    <ClCompile Include="Core\Levels\Children\LGame_LevelBase.cpp" />
+    <ClCompile Include="Core\Levels\Children\LMainMenu_Level.cpp" />
+    <ClCompile Include="Core\Levels\LLevel.cpp" />
     <ClCompile Include="Core\LObject.cpp" />
     <ClCompile Include="Core\LazyWidgets\Button\LazyButton.cpp" />
+    <ClCompile Include="Core\Player\LPlayableCharacterBase.cpp" />
+    <ClCompile Include="Core\Primitive\Children\BoundingBox_Collision.cpp" />
+    <ClCompile Include="Core\Primitive\LCollisionBase.cpp" />
     <ClCompile Include="GameMenu\GenericMenus\Modals\Generic_Modal_Menu.cpp" />
     <ClCompile Include="GameMenu\GMenu.cpp" />
     <ClCompile Include="GameMenu\MainMenu\LCreditMenu_Screen.cpp" />
@@ -157,16 +170,32 @@
     <ClCompile Include="NEO SAVES THE OCEAN.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\FunctionLibrary\LCoreStatic.h" />
     <ClInclude Include="Core\GEngine.h" />
+    <ClInclude Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LGameScreen_Layer.h" />
+    <ClInclude Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LHealthStat.h" />
+    <ClInclude Include="Core\LazyWidgets\GameUI\LGameHUD.h" />
+    <ClInclude Include="Core\LazyWidgets\GameUI\LProgressBar.h" />
     <ClInclude Include="Core\LazyWidgets\LazyEnvoyDeclaraction.h" />
+    <ClInclude Include="Core\Levels\Children\LFirstGame_Level.h" />
+    <ClInclude Include="Core\Levels\Children\LGame_LevelBase.h" />
+    <ClInclude Include="Core\Levels\Children\LMainMenu_Level.h" />
+    <ClInclude Include="Core\Levels\LLevel.h" />
     <ClInclude Include="Core\LObject.h" />
     <ClInclude Include="Core\LazyWidgets\Button\LazyButton.h" />
+    <ClInclude Include="Core\Player\LPlayableCharacterBase.h" />
+    <ClInclude Include="Core\Primitive\Children\BoundingBox_Collision.h" />
+    <ClInclude Include="Core\Primitive\LCollisionBase.h" />
     <ClInclude Include="GameMenu\GenericMenus\Modals\Generic_Modal_Menu.h" />
     <ClInclude Include="GameMenu\GMenu.h" />
     <ClInclude Include="GameMenu\MainMenu\LCreditMenu_Screen.h" />
     <ClInclude Include="GameMenu\MainMenu\LMainMenu_Screen.h" />
     <ClInclude Include="GameMenu\MainMenu\LMenu_Hud.h" />
     <ClInclude Include="GameMenu\MainMenu\LOptionMenu_Screen.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Core\LazyWidgets\GameUI\Layers\GameMenu\" />
+    <Folder Include="Core\LazyWidgets\GameUI\Layers\Modal\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

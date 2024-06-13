@@ -25,6 +25,12 @@ void LObject::OnMouseEnter()
 void LObject::OnMouseLeave()
 {}
 
+void LObject::OnKeyPressed(sf::Keyboard::Key InputKey)
+{}
+
+void LObject::OnKeyReleased(sf::Keyboard::Key InputKey)
+{}
+
 void LObject::OnMouseButtonAction(sf::Mouse::Button MouseAction)
 {
     switch (MouseAction)
@@ -47,10 +53,19 @@ void LObject::OnMouseButtonAction(sf::Mouse::Button MouseAction)
     }
 }
 
+void LObject::SetPosition(const sf::Vector2f& NewPosition)
+{}
+
 void LObject::SetDefaultFont(const sf::Font& NewFont)
 {
     Default_Font = NewFont;
 }
+
+void LObject::SetRotation( const float& Rotation )
+{}
+
+void LObject::SetScale( const sf::Vector2f& Scale )
+{}
 
 // DrawToWindow function implementation
 void LObject::DrawToWindow(sf::RenderWindow& Render_Window)
@@ -59,6 +74,9 @@ void LObject::DrawToWindow(sf::RenderWindow& Render_Window)
     // meant to be overridden by derived classes.
     // Add specific drawing logic in derived classes.
 }
+
+void LObject::Update(float Delta_Time)
+{}
 
 void LObject::OnMouseButtonMove(sf::RenderWindow& Render_Window)
 {

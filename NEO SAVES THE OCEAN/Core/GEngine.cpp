@@ -1,39 +1,38 @@
 // GEngine.cpp
 #include "GEngine.h"
+#include <chrono>
 #include "../GameMenu/MainMenu/LMenu_Hud.h"
 #include "../GameMenu/MainMenu/LMainMenu_Screen.h"
+#include "Levels/LLevel.h"
+#include "Levels/Children/LMainMenu_Level.h"
 
 GEngine* GEngine::Instance = nullptr;
 
 GEngine::GEngine(int WindowWidth_px, int WindowHeight_px, const std::string& GameWindowTitle)
-:GameVideoMode(WindowWidth_px, WindowHeight_px)
+    : GameVideoMode(WindowWidth_px, WindowHeight_px), GameWindowEvent()
 {
     this->GameWindowSize = {static_cast<unsigned>(WindowWidth_px), static_cast<unsigned>(WindowHeight_px)};
     this->GameWindowTitle = GameWindowTitle;
 }
 
-GEngine::~GEngine() = default;
+GEngine::~GEngine()
+{
+    delete Instance;
+}
 
 GEngine& GEngine::Build(int WindowWidth_px, int WindowHeight_px, const std::string& GameWindowTitle)
 {
-    if ( Instance != nullptr )
-    {
-        throw std::runtime_error("you are not allowed to build the engine twice!");
-    }
+    if ( Instance != nullptr ) throw std::runtime_error("you are not allowed to build the engine twice!");
+    
     Instance = new GEngine(WindowWidth_px, WindowHeight_px, GameWindowTitle);
-    Instance->MenuHud = new LMenu_Hud();
-    Instance->MainMenuScreen = new LMainMenu_Screen();
+    Instance->LoadLevel( new LMainMenu_Level() );
     return *Instance;
 }
 
-
 GEngine& GEngine::GetInstance()
 {
-    if (Instance == nullptr)
-    {
-        throw std::runtime_error("engine was not started");
-        //Instance = new GEngine();
-    }
+    if (Instance == nullptr) throw std::runtime_error("engine was not started");
+
     return *Instance;
 }
 
@@ -42,40 +41,36 @@ void GEngine::SetCurrentGameLevelState(GameLevelState state)
     CurrentGameLevelState = state;
 }
 
+void GEngine::LoadLevel(LLevel* newLevel)
+{
+    if(newLevel == nullptr) return;
+    
+    ActiveLevel.reset(newLevel);
+    ActiveLevel->Init();
+}
+
 void GEngine::UpdateGame()
 {
+    const auto currentTime = std::chrono::system_clock::now();
+    const std::chrono::duration<float> elapsedSeconds = currentTime - Last_Frame_Time;
+    DeltaTime = elapsedSeconds.count();
+    Last_Frame_Time = currentTime;
+    
     UpdateGamePoolEvents();
-    UpdateGameLogic();
 
-    // Call registered update functions
-    for (const auto& updateFunction : UpdateFunctions)
-    {
-        updateFunction();
-    }
+    if( ActiveLevel == nullptr ) throw std::runtime_error("No active level, a level must be initialised");
+
+    ActiveLevel->Update(DeltaTime);
 }
 
 void GEngine::RenderGame() const
 {
     GameWindow->clear(sf::Color(190, 190, 190));
-    RenderMenuHUD(); 
 
-    // Call registered render functions
-    for (const auto& renderFunction : RenderFunctions)
-    {
-        renderFunction();
-    }
+    if( ActiveLevel == nullptr ) throw std::runtime_error("No active level, a level must be initialised");
 
+    ActiveLevel->Render(*GameWindow);
     GameWindow->display();
-}
-
-void GEngine::RegisterUpdateFunction(const std::function<void()>& updateFunction)
-{
-    UpdateFunctions.push_back(updateFunction);
-}
-
-void GEngine::RegisterRenderFunction(const std::function<void()>& renderFunction)
-{
-    RenderFunctions.push_back(renderFunction);
 }
 
 void GEngine::InitWindow()
@@ -83,41 +78,19 @@ void GEngine::InitWindow()
     GameWindow = new sf::RenderWindow(GameVideoMode, GameWindowTitle, sf::Style::Close | sf::Style::Titlebar | sf::Style::Resize);
 }
 
-void GEngine::UpdateGameLogic()
-{
-    // Add your game logic update code here
-}
-
-void GEngine::RenderMenuHUD() const
-{
-    MenuHud->DrawToWindow(*GameWindow);
-}
-
 void GEngine::RecalculateMouseMove() const
 {
-    switch (CurrentGameLevelState)
-    {
-    case GameLevelState::Menu_Level:
-        MenuHud->OnMouseButtonMove(*GameWindow);
-        break;
-    case GameLevelState::GameLevel:
-        // Handle mouse move in the game level
-        break;
-    }
+    if( ActiveLevel == nullptr ) return;
+
+    ActiveLevel->OnMouseButtonMove(*GameWindow);
 }
 
 void GEngine::RecalculateMousePressed() const
 {
-    switch (CurrentGameLevelState)
-    {
-    case GameLevelState::Menu_Level:
-        MenuHud->OnMouseButtonAction(sf::Mouse::Left);
-        MenuHud->OnMouseButtonAction(sf::Mouse::Right);
-        break;
-    case GameLevelState::GameLevel:
-        // Handle mouse button press in the game level
-            break;
-    }
+    if( ActiveLevel == nullptr ) return;
+    
+    ActiveLevel->OnMouseButtonAction(sf::Mouse::Left);
+    ActiveLevel->OnMouseButtonAction(sf::Mouse::Right);
 }
 
 void GEngine::UpdateGamePoolEvents()
@@ -129,9 +102,15 @@ void GEngine::UpdateGamePoolEvents()
         case sf::Event::Closed:
             GameWindow->close();
             break;
+        case sf::Event::KeyPressed:
+            if( ActiveLevel == nullptr ) return;
+
+            ActiveLevel->OnKeyPressed(GameWindowEvent.key.code);
+            break;
         case sf::Event::KeyReleased:
-            if (GameWindowEvent.key.code == sf::Keyboard::Escape)
-                GameWindow->close();
+            if( ActiveLevel == nullptr ) return;
+
+            ActiveLevel->OnKeyReleased(GameWindowEvent.key.code);
             break;
         case sf::Event::MouseMoved:
             RecalculateMouseMove();

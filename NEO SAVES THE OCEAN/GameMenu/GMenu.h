@@ -12,7 +12,7 @@ protected:
     sf::Texture Background_Texture;
     sf::Sprite Background_Sprite;
     sf::Sprite Overlay_Sprite;
-    sf::Color OverlayColor = {sf::Uint8(3),sf::Uint8(4),sf::Uint8(15),sf::Uint8( 0 )};
+    sf::Color OverlayColor = {static_cast<sf::Uint8>(3),static_cast<sf::Uint8>(4),static_cast<sf::Uint8>(15),static_cast<sf::Uint8>(0)};
 
    public:
     // Constructor / Destructor

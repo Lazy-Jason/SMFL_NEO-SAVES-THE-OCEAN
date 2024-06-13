@@ -48,9 +48,9 @@ void LMainMenu_Screen::OnMouseRelease()
 {
     GMenu::OnMouseRelease();
     Play_Button.OnMouseButtonAction(sf::Mouse::Right);
-    Options_Button.OnMouseButtonAction(sf::Mouse::Right);
+    /*Options_Button.OnMouseButtonAction(sf::Mouse::Right);
     Credits_Button.OnMouseButtonAction(sf::Mouse::Right);
-    Exit_Button.OnMouseButtonAction(sf::Mouse::Right);
+    Exit_Button.OnMouseButtonAction(sf::Mouse::Right);*/
 }
 
 void LMainMenu_Screen::DrawToWindow(sf::RenderWindow& Render_Window)

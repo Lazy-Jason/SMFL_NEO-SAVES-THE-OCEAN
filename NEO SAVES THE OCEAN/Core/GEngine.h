@@ -1,13 +1,14 @@
 // GEngine.h
 #pragma once
+#include <chrono>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <vector>
 #include <memory>
 #include <functional>
 
-class LMenu_Hud;
-class LMainMenu_Screen;
+class LObject;
+class LLevel;
 
 /**
  * @brief Represents the current state of the game level.
@@ -23,6 +24,14 @@ enum class GameLevelState
  */
 class GEngine
 {
+
+   std::unique_ptr<LLevel> ActiveLevel = nullptr;
+ 
+   std::vector<std::shared_ptr<LObject>> SpawnedObjects;
+
+   std::chrono::system_clock::time_point Last_Frame_Time;
+   float DeltaTime = 0;
+ 
 public:
     /**
      * @brief Constructs a GEngine object with the specified window size and title.
@@ -36,8 +45,11 @@ public:
      * @brief Destroys the GEngine object and its associated resources.
      */
     ~GEngine();
+ 
+    template <typename T>
+    std::shared_ptr<T> SpawnObjectAtLocation(const sf::Vector2f Location, const float Rotation, const sf::Vector2f Scale);
 
-    /**
+   /**
      * @brief Returns the singleton instance of the GEngine class.
      * @return The singleton instance of the GEngine class.
      */
@@ -93,18 +105,6 @@ public:
     sf::Font& GetMenuFont() { return MenuFont; }
 
     /**
-     * @brief Returns a reference to the menu HUD object.
-     * @return A reference to the menu HUD object.
-     */
-    LMenu_Hud& GetMenu_Hud() const { return *MenuHud; }
-
-    /**
-     * @brief Returns a reference to the main menu screen object.
-     * @return A reference to the main menu screen object.
-     */
-    LMainMenu_Screen& GetMain_Menu_Screen() const { return *MainMenuScreen; }
-
-    /**
      * @brief Returns the current game level state.
      * @return The current game level state.
      */
@@ -116,6 +116,9 @@ public:
      */
     void SetCurrentGameLevelState(GameLevelState state);
 
+
+    void LoadLevel( LLevel* newLevel );
+
     /**
      * @brief Updates the game loop.
      */
@@ -126,31 +129,7 @@ public:
      */
     void RenderGame() const;
 
-    /**
-     * @brief Registers a function to be called during the game update loop.
-     * @param updateFunction The function to be called during the game update loop.
-     */
-    void RegisterUpdateFunction(const std::function<void()>& updateFunction);
-
-    /**
-     * @brief Registers a function to be called during the game rendering process.
-     * @param renderFunction The function to be called during the game rendering process.
-     */
-    void RegisterRenderFunction(const std::function<void()>& renderFunction);
-
- 
-
 private:
-
-    /**
-     * @brief Updates the game logic.
-     */
-    static void UpdateGameLogic();
-
-    /**
-     * @brief Renders the menu HUD.
-     */
-    void RenderMenuHUD() const;
 
     /**
      * @brief Recalculates the mouse move event based on the current game level state.
@@ -173,12 +152,22 @@ private:
     std::string GameWindowTitle;             ///< The title of the game window.
     sf::Vector2u GameWindowSize;             ///< The size of the game window.
     sf::Font MenuFont;                       ///< The font used for the menu.
-    LMenu_Hud* MenuHud;      ///< The menu HUD object.
-    LMainMenu_Screen* MainMenuScreen; ///< The main menu screen object.
     GameLevelState CurrentGameLevelState = GameLevelState::Menu_Level; ///< The current game level state.
-
-    std::vector<std::function<void()>> UpdateFunctions; ///< A vector of functions to be called during the game update loop.
-    std::vector<std::function<void()>> RenderFunctions; ///< A vector of functions to be called during the game rendering process.
 
     static GEngine* Instance; ///< The singleton instance of the game engine.
 };
+
+template <typename T>
+std::shared_ptr<T> GEngine::SpawnObjectAtLocation(const sf::Vector2f Location, const float Rotation, const sf::Vector2f Scale)
+{
+ static_assert(std::is_base_of_v<LObject, T>, "T must be derived from LObject");
+
+ const std::shared_ptr<T> NewObject = std::make_shared<T>();
+
+ NewObject->SetPosition(Location);
+ NewObject->SetRotation(Rotation);
+ NewObject->SetScale(Scale);
+
+ SpawnedObjects.push_back(NewObject);
+ return NewObject;
+}

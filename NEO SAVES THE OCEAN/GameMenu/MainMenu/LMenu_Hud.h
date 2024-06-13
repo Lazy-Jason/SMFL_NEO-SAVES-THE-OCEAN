@@ -7,7 +7,6 @@
 
 class LMenu_Hud : public LObject
 {
-    sf::RenderWindow* GameWindowREF;
     int MenuIndex = 0;
     bool bIsConfirmingExit = false;
 public:
@@ -15,6 +14,8 @@ public:
     LOptionMenu_Screen Options_Menu_Screen;
     LCreditMenu_Screen Credit_Menu_Screen;
     Generic_Modal_Menu ExitModalMenu;
+
+    CallbackFunction OnPlay_ButtonReleasedEnvoy; ///< Callback function for the Play button release event.
 
 protected:
 public:
@@ -24,7 +25,9 @@ public:
     LObject* GetMenuByIndex( int Index );
 
     void SetActiveWindowByIndex( int Index );
-    void DrawToWindow(sf::RenderWindow& Render_Window) override;
-    void OnMouseButtonMove(sf::RenderWindow& Render_Window) override;
-    void OnMouseButtonAction(sf::Mouse::Button MouseAction) override;
+    void DrawToWindow( sf::RenderWindow& Render_Window ) override;
+    void OnMouseButtonMove( sf::RenderWindow& Render_Window ) override;
+    void OnMouseButtonAction( sf::Mouse::Button MouseAction ) override;
+
+    void OpenLevel();
 };

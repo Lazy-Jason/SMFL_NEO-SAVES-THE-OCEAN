@@ -17,13 +17,11 @@ void GMenu::SetBackgroundTexture(const sf::Texture& NewTexture, sf::Uint8 Opacit
 
 void GMenu::ScaleBackgroundSprite()
 {
-    if (const GEngine* GameInstance = &GEngine::GetInstance())
-    {
-        printf("The size of the window is %d : %d \n", GameInstance->GetGameWindowSize().x, GameInstance->GetGameWindowSize().y);
-    }
+    const GEngine* GameInstance = &GEngine::GetInstance();
+    if(!GameInstance) return;
     
     // Get the size of the game window
-    const sf::Vector2u windowSize = {1920, 1080};
+    const sf::Vector2u windowSize = {GameInstance->GetGameWindowSize().x, GameInstance->GetGameWindowSize().y};
     // Check if the window size and background sprite dimensions are valid
     if (windowSize.x > 0 && windowSize.y > 0 && Background_Sprite.getGlobalBounds().width > 0 && Background_Sprite.getGlobalBounds().height > 0)
     {
@@ -46,6 +44,7 @@ void GMenu::DrawToWindow(sf::RenderWindow& Render_Window)
 {
     LObject::DrawToWindow(Render_Window);
     if (Background_Sprite.getTexture() == nullptr) return;
+    
     Render_Window.draw(Background_Sprite);
     Render_Window.draw(Overlay_Sprite);
 }
