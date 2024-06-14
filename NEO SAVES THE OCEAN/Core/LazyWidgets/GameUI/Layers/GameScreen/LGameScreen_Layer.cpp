@@ -3,7 +3,7 @@
 #include "../../LProgressBar.h"
 
 LGameScreen_Layer::LGameScreen_Layer() : Health_StatWidget(std::make_unique<LHealthStat>()),
-Boost_StatWidget(std::make_unique<LProgressBar>(sf::Vector2f(300, 20), sf::Color::Cyan, sf::Color(1, 1, 1, 50)))
+Boost_StatWidget(std::make_unique<LProgressBar>(sf::Vector2f(300, 20), sf::Color::Cyan, sf::Color(1, 1, 1, 150)))
 {
     if(Health_StatWidget != nullptr) Health_StatWidget->SetPosition({50, 50});
     if(Boost_StatWidget != nullptr) Boost_StatWidget->SetPosition({50, 130});

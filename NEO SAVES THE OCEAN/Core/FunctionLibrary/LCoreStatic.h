@@ -3,6 +3,7 @@
 #include "../GEngine.h"
 #include <iostream>
 
+class LPlayableCharacterBase;
 class LObject;
 
 struct LObjectSpawnParameter
@@ -32,6 +33,19 @@ public:
      */
     template <typename T, typename = std::enable_if_t<std::is_base_of_v<LObject, T>>>
     static std::shared_ptr<T> SpawnLObject(const LObjectSpawnParameter& Spawn_Parameter);
+
+    /**
+    * \brief Retrieves the player character from the current active game level.
+    * 
+    * This function accesses the current active level from the game engine instance
+    * and attempts to dynamically cast it to an `LGame_LevelBase` object. If successful,
+    * it retrieves and returns the player character from the game level. If the cast
+    * fails or if the game engine instance or active level is null, it returns nullptr.
+    * 
+    * \return A shared pointer to the player character if the active level is an instance
+    *         of `LGame_LevelBase`, otherwise nullptr.
+    */
+    static std::shared_ptr<LPlayableCharacterBase> GetPlayerCharacter();
 };
 
 template <typename T, typename>

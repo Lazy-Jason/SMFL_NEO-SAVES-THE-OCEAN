@@ -56,6 +56,18 @@ void LObject::OnMouseButtonAction(sf::Mouse::Button MouseAction)
 void LObject::SetPosition(const sf::Vector2f& NewPosition)
 {}
 
+bool LObject::Destroy()
+{
+    GEngine* Engine = &GEngine::GetInstance();
+    if( Engine == nullptr ) return false;
+
+    const bool Destroyed = Engine->Destroy(this);
+    if(!Destroyed) return Destroyed;
+    
+    OnDestroy.AlertEnvoys();
+     return Destroyed;
+}
+
 void LObject::SetDefaultFont(const sf::Font& NewFont)
 {
     Default_Font = NewFont;

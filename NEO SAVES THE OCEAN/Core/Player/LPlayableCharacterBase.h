@@ -1,5 +1,5 @@
 #pragma once
-#include "../LObject.h"
+#include "../LSpawnableObject.h"
 #include "../LazyWidgets/LazyEnvoyDeclaraction.h"
 
 struct PlayerAttribute
@@ -8,7 +8,7 @@ struct PlayerAttribute
     float MaxBoost = 100.0f;
 };
 
-class LPlayableCharacterBase : public LObject
+class LPlayableCharacterBase : public LSpawnableObject
 {
     sf::Sprite PlayerBounds;
     sf::Texture PlayerTexture;
@@ -20,8 +20,8 @@ class LPlayableCharacterBase : public LObject
     float CurrentBoost;
     
     sf::Vector2f InputAxis = {0, 0};
-    bool bCanRemoveBoost = false;
-    float BoostDecrement_Rate = 1.0;
+    bool bIsBoosting = false;
+    float BoostDecrement_Rate = 20.0f;
 
 public:
     LazyEnvoy OnBoostAdded;
@@ -55,7 +55,7 @@ public:
     
     void RemoveBoost( float Amount );
 
-    void StartRemovingBoostByRate();
+    void StartRemovingBoostByRate(float Delta_Time);
     
     void OnKeyPressed(sf::Keyboard::Key InputKey) override;
 

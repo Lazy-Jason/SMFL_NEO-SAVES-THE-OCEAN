@@ -158,9 +158,11 @@
     <ClCompile Include="Core\Levels\LLevel.cpp" />
     <ClCompile Include="Core\LObject.cpp" />
     <ClCompile Include="Core\LazyWidgets\Button\LazyButton.cpp" />
+    <ClCompile Include="Core\LSpawnableObject.cpp" />
     <ClCompile Include="Core\Player\LPlayableCharacterBase.cpp" />
-    <ClCompile Include="Core\Primitive\Children\BoundingBox_Collision.cpp" />
-    <ClCompile Include="Core\Primitive\LCollisionBase.cpp" />
+    <ClCompile Include="Core\Primitive\Collision.cpp" />
+    <ClCompile Include="Core\Primitive\Collision\LCollisionBase.cpp" />
+    <ClCompile Include="Core\Primitive\Objects\LTrashCan.cpp" />
     <ClCompile Include="GameMenu\GenericMenus\Modals\Generic_Modal_Menu.cpp" />
     <ClCompile Include="GameMenu\GMenu.cpp" />
     <ClCompile Include="GameMenu\MainMenu\LCreditMenu_Screen.cpp" />
@@ -183,9 +185,11 @@
     <ClInclude Include="Core\Levels\LLevel.h" />
     <ClInclude Include="Core\LObject.h" />
     <ClInclude Include="Core\LazyWidgets\Button\LazyButton.h" />
+    <ClInclude Include="Core\LSpawnableObject.h" />
     <ClInclude Include="Core\Player\LPlayableCharacterBase.h" />
-    <ClInclude Include="Core\Primitive\Children\BoundingBox_Collision.h" />
-    <ClInclude Include="Core\Primitive\LCollisionBase.h" />
+    <ClInclude Include="Core\Primitive\Collision.h" />
+    <ClInclude Include="Core\Primitive\Collision\LCollisionBase.h" />
+    <ClInclude Include="Core\Primitive\Objects\LTrashCan.h" />
     <ClInclude Include="GameMenu\GenericMenus\Modals\Generic_Modal_Menu.h" />
     <ClInclude Include="GameMenu\GMenu.h" />
     <ClInclude Include="GameMenu\MainMenu\LCreditMenu_Screen.h" />

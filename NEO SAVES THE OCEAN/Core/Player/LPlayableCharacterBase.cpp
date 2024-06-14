@@ -8,30 +8,34 @@ LPlayableCharacterBase::LPlayableCharacterBase()
     }
     CurrentHealth = Attribute.MaxHealth;
     CurrentBoost = Attribute.MaxBoost;
+    SetCollisionComponent(std::make_shared<LBoxCollisionComponent>(sf::Vector2f(PlayerBounds.getGlobalBounds().width, PlayerBounds.getGlobalBounds().height)));
 }
 
 void LPlayableCharacterBase::OnMouseButtonAction(const sf::Mouse::Button MouseAction)
 {
-    LObject::OnMouseButtonAction(MouseAction);
+    LSpawnableObject::OnMouseButtonAction(MouseAction);
 }
 
 void LPlayableCharacterBase::OnMouseButtonMove(sf::RenderWindow& Render_Window)
 {
-    LObject::OnMouseButtonMove(Render_Window);
+    LSpawnableObject::OnMouseButtonMove(Render_Window);
 }
 
 void LPlayableCharacterBase::SetPosition(const sf::Vector2f& NewPosition)
 {
+    LSpawnableObject::SetPosition(NewPosition);
     PlayerBounds.setPosition(NewPosition);
 }
 
 void LPlayableCharacterBase::SetRotation(const float& Rotation)
 {
+    LSpawnableObject::SetRotation(Rotation);
     PlayerBounds.setRotation(Rotation);
 }
 
 void LPlayableCharacterBase::SetScale(const sf::Vector2f& scale)
 {
+    LSpawnableObject::SetScale(scale);
     PlayerBounds.setScale(scale);
 }
 
@@ -40,15 +44,20 @@ void LPlayableCharacterBase::Update(const float Delta_Time)
     if (InputAxis.x == 0 && InputAxis.y == 0) return;
 
     // Calculate the desired movement
-    const sf::Vector2f desiredMovement = InputAxis * Speed * Delta_Time;
+    const sf::Vector2f desiredMovement = InputAxis * (bIsBoosting? Speed_Boost : Speed) * Delta_Time;
 
     // Apply the movement
     PlayerBounds.move(desiredMovement);
+    if (bIsBoosting)
+    {
+        StartRemovingBoostByRate(Delta_Time);
+    }
 }
 
 void LPlayableCharacterBase::DrawToWindow(sf::RenderWindow& Render_Window)
 {
     Render_Window.draw(PlayerBounds);
+    if(GetCollisionComponent() != nullptr) GetCollisionComponent()->Draw(Render_Window);
 }
 
 void LPlayableCharacterBase::AddMovementAxis(const float x, const float y)
@@ -69,17 +78,14 @@ void LPlayableCharacterBase::RemoveBoost(float Amount)
     OnBoostRemoved.AlertEnvoys();
 }
 
-void LPlayableCharacterBase::StartRemovingBoostByRate()
+void LPlayableCharacterBase::StartRemovingBoostByRate(const float Delta_Time)
 {
-    if(!bCanRemoveBoost) return;
+    if (!bIsBoosting) return;
 
-    RemoveBoost(BoostDecrement_Rate);
-    if(CurrentBoost <= 0)
-    {
-        bCanRemoveBoost = false;
-        return;
-    }
-    StartRemovingBoostByRate();
+    const float boostRemoved = BoostDecrement_Rate * Delta_Time;
+    RemoveBoost(boostRemoved);
+
+    if (CurrentBoost <= 0) bIsBoosting = false;
 }
 
 void LPlayableCharacterBase::OnKeyPressed( const sf::Keyboard::Key InputKey )
@@ -99,7 +105,7 @@ void LPlayableCharacterBase::OnKeyPressed( const sf::Keyboard::Key InputKey )
         InputAxis.x = 1.0f;
         break;
     case sf::Keyboard::LShift:
-        StartRemovingBoostByRate();
+        bIsBoosting = true;
         break;
     default:
         break;
@@ -123,7 +129,7 @@ void LPlayableCharacterBase::OnKeyReleased( const sf::Keyboard::Key InputKey )
         InputAxis.x = 0.0f;
         break;
     case sf::Keyboard::LShift:
-        bCanRemoveBoost = false;
+        bIsBoosting = false;
         break;
     default:
         break;

@@ -49,6 +49,8 @@ public:
     template <typename T>
     std::shared_ptr<T> SpawnObjectAtLocation(const sf::Vector2f Location, const float Rotation, const sf::Vector2f Scale);
 
+    bool Destroy(LObject* object);
+
    /**
      * @brief Returns the singleton instance of the GEngine class.
      * @return The singleton instance of the GEngine class.
@@ -118,6 +120,8 @@ public:
 
 
     void LoadLevel( LLevel* newLevel );
+
+    const std::unique_ptr<LLevel>& GetActiveLevel() const { return ActiveLevel; }
 
     /**
      * @brief Updates the game loop.

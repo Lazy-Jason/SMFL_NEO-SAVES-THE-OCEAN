@@ -7,7 +7,14 @@ void LazyEnvoy::AddEnvoy(const std::function<void()>& CallbackFunction)
 
 void LazyEnvoy::RemoveEnvoy(const std::function<void()>& CallbackFunction)
 {
-    std::erase(AllEnvoys, CallbackFunction);
+    const auto it = std::remove_if(AllEnvoys.begin(), AllEnvoys.end(),
+   [&CallbackFunction](const std::function<void()>& func)
+   {
+       // Compare the target of the functions
+       return CallbackFunction.target_type() == func.target_type() &&
+           CallbackFunction.target<void()>() == func.target<void()>();
+   });
+    AllEnvoys.erase(it, AllEnvoys.end());
 }
 
 bool LazyEnvoy::ClearEnvoy() const
