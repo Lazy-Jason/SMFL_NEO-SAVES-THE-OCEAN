@@ -3,9 +3,9 @@
 #include <chrono>
 #include "../GameMenu/MainMenu/LMenu_Hud.h"
 #include "../GameMenu/MainMenu/LMainMenu_Screen.h"
-#include "Levels/LLevel.h"
-#include "Levels/Children/LGame_LevelBase.h"
 #include "Levels/Children/LMainMenu_Level.h"
+#include "LSpawnableObject.h"
+#include "Levels/LLevel.h"
 
 GEngine* GEngine::Instance = nullptr;
 
@@ -28,31 +28,6 @@ GEngine& GEngine::Build(int WindowWidth_px, int WindowHeight_px, const std::stri
     Instance = new GEngine(WindowWidth_px, WindowHeight_px, GameWindowTitle);
     Instance->LoadLevel( new LMainMenu_Level() );
     return *Instance;
-}
-
-bool GEngine::Destroy(LObject* object)
-{
-    // Find the object in the SpawnedObjects vector
-    const auto it = std::ranges::find_if(SpawnedObjects, [object](const std::shared_ptr<LObject>& ptr)
-    {
-        return ptr.get() == object;
-    });
-
-    // If the object is not found, return false
-    if (it == SpawnedObjects.end())
-        return false;
-
-    // Reset the shared pointer to null
-    it->reset();
-
-    // Erase the nullified shared pointers using erase-remove idiom
-    SpawnedObjects.erase(
-        std::ranges::remove(SpawnedObjects, nullptr).begin(),
-        SpawnedObjects.end()
-    );
-
-    /*delete object;*/
-    return true;
 }
 
 GEngine& GEngine::GetInstance()

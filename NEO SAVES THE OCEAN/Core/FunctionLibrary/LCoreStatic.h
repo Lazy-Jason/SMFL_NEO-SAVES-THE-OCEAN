@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "../Levels/LLevel.h"
 #include "../GEngine.h"
-#include <iostream>
+
 
 class LPlayableCharacterBase;
 class LObject;
@@ -33,7 +34,7 @@ public:
      */
     template <typename T, typename = std::enable_if_t<std::is_base_of_v<LObject, T>>>
     static std::shared_ptr<T> SpawnLObject(const LObjectSpawnParameter& Spawn_Parameter);
-
+    
     /**
     * \brief Retrieves the player character from the current active game level.
     * 
@@ -45,14 +46,23 @@ public:
     * \return A shared pointer to the player character if the active level is an instance
     *         of `LGame_LevelBase`, otherwise nullptr.
     */
-    static std::shared_ptr<LPlayableCharacterBase> GetPlayerCharacter();
+    static std::weak_ptr<LPlayableCharacterBase> GetPlayerCharacter();
+
+    /**
+     * \brief Destroys the specified object.
+     * \param ObjectToDestroy The object to destroy.
+     * \return True if the object was successfully destroyed, false otherwise.
+     */
+    static bool DestroyObject( std::shared_ptr<LSpawnableObject>& ObjectToDestroy );
 };
 
 template <typename T, typename>
 std::shared_ptr<T> LCoreStatic::SpawnLObject(const LObjectSpawnParameter& Spawn_Parameter)
 {
     GEngine* Instance;
-    if ((Instance = &GEngine::GetInstance()) == nullptr) return nullptr;
+    if(( Instance = &GEngine::GetInstance()) == nullptr ) return nullptr;
 
-    return Instance->SpawnObjectAtLocation<T>(Spawn_Parameter.Location, Spawn_Parameter.Rotation, Spawn_Parameter.Scale);
+    if(Instance->GetActiveLevel() == nullptr) return nullptr;
+
+    return Instance->GetActiveLevel()->SpawnObjectAtLocation<T>(Spawn_Parameter.Location, Spawn_Parameter.Rotation, Spawn_Parameter.Scale);
 }

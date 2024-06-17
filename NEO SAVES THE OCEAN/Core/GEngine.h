@@ -9,6 +9,7 @@
 
 class LObject;
 class LLevel;
+class LSpawnableObject;
 
 /**
  * @brief Represents the current state of the game level.
@@ -26,8 +27,6 @@ class GEngine
 {
 
    std::unique_ptr<LLevel> ActiveLevel = nullptr;
- 
-   std::vector<std::shared_ptr<LObject>> SpawnedObjects;
 
    std::chrono::system_clock::time_point Last_Frame_Time;
    float DeltaTime = 0;
@@ -45,11 +44,6 @@ public:
      * @brief Destroys the GEngine object and its associated resources.
      */
     ~GEngine();
- 
-    template <typename T>
-    std::shared_ptr<T> SpawnObjectAtLocation(const sf::Vector2f Location, const float Rotation, const sf::Vector2f Scale);
-
-    bool Destroy(LObject* object);
 
    /**
      * @brief Returns the singleton instance of the GEngine class.
@@ -160,18 +154,3 @@ private:
 
     static GEngine* Instance; ///< The singleton instance of the game engine.
 };
-
-template <typename T>
-std::shared_ptr<T> GEngine::SpawnObjectAtLocation(const sf::Vector2f Location, const float Rotation, const sf::Vector2f Scale)
-{
- static_assert(std::is_base_of_v<LObject, T>, "T must be derived from LObject");
-
- const std::shared_ptr<T> NewObject = std::make_shared<T>();
-
- NewObject->SetPosition(Location);
- NewObject->SetRotation(Rotation);
- NewObject->SetScale(Scale);
-
- SpawnedObjects.push_back(NewObject);
- return NewObject;
-}

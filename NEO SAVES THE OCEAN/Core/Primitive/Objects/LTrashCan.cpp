@@ -1,5 +1,6 @@
 #include "LTrashCan.h"
 #include "..\Collision.h"
+#include "../../FunctionLibrary/LCoreStatic.h"
 #include "../../Player/LPlayableCharacterBase.h"
 
 LTrashCan::LTrashCan()
@@ -42,9 +43,9 @@ void LTrashCan::DrawToWindow(sf::RenderWindow& Render_Window)
 
 void LTrashCan::OnCollisionBeginOverlap(const std::shared_ptr<LCollisionBase>& Other)
 {
-    LSpawnableObject::OnCollisionBeginOverlap(Other);
     // do we have a valid player and do the collision component belong to the player.?
-    if(LCoreStatic::GetPlayerCharacter() != nullptr && LCoreStatic::GetPlayerCharacter()->GetCollisionComponent() != Other) return;
+    if(LCoreStatic::GetPlayerCharacter().lock() == nullptr || LCoreStatic::GetPlayerCharacter().lock()->GetCollisionComponent() != Other) return;
+    printf("Overlap begin \n");
     
     OnTrashCollected.AlertEnvoys();
     Destroy();

@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "FunctionLibrary/LCoreStatic.h"
+
 LSpawnableObject::LSpawnableObject()
 = default;
 
@@ -30,11 +32,16 @@ void LSpawnableObject::SetScale(const sf::Vector2f& Scale)
     if(CollisionComponent != nullptr) CollisionComponent->SetScale(Scale);
 }
 
-void LSpawnableObject::OnCollisionBeginOverlap(const std::shared_ptr<LCollisionBase>& Other)
+void LSpawnableObject::EvaluateOverlap( const std::shared_ptr<LCollisionBase>& Other )
 {
-    if(Other == nullptr || Other == OverlappedComponent) return;
+    if(Other == OverlappedComponent) return;
     OverlappedComponent = Other;
+    
+    OnCollisionBeginOverlap(OverlappedComponent);
 }
+
+void LSpawnableObject::OnCollisionBeginOverlap(const std::shared_ptr<LCollisionBase>& Other)
+{}
 
 void LSpawnableObject::OnCollisionEndOverlap(const std::shared_ptr<LCollisionBase>& Other)
 {
@@ -46,4 +53,15 @@ void LSpawnableObject::ReclaimOverlap()
     if(OverlappedComponent == nullptr) return;
 
     OnCollisionEndOverlap(OverlappedComponent);
+}
+
+bool LSpawnableObject::Destroy()
+{
+    // Use shared_from_this() to create a shared_ptr from 'this' pointer
+    auto sharedThis = shared_from_this();
+    
+    if (!LCoreStatic::DestroyObject(sharedThis)) return false;
+    OnDestroy.AlertEnvoys();
+    
+    return true;
 }

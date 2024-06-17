@@ -149,6 +149,8 @@
     <ClCompile Include="Core\GEngine.cpp" />
     <ClCompile Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LGameScreen_Layer.cpp" />
     <ClCompile Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LHealthStat.cpp" />
+    <ClCompile Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LStarsStatus.cpp" />
+    <ClCompile Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LTrashStatus.cpp" />
     <ClCompile Include="Core\LazyWidgets\GameUI\LGameHUD.cpp" />
     <ClCompile Include="Core\LazyWidgets\GameUI\LProgressBar.cpp" />
     <ClCompile Include="Core\LazyWidgets\LazyEnvoyDeclaraction.cpp" />
@@ -176,6 +178,8 @@
     <ClInclude Include="Core\GEngine.h" />
     <ClInclude Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LGameScreen_Layer.h" />
     <ClInclude Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LHealthStat.h" />
+    <ClInclude Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LStarsStatus.h" />
+    <ClInclude Include="Core\LazyWidgets\GameUI\Layers\GameScreen\LTrashStatus.h" />
     <ClInclude Include="Core\LazyWidgets\GameUI\LGameHUD.h" />
     <ClInclude Include="Core\LazyWidgets\GameUI\LProgressBar.h" />
     <ClInclude Include="Core\LazyWidgets\LazyEnvoyDeclaraction.h" />

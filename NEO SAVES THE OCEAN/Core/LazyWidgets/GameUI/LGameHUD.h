@@ -14,4 +14,5 @@ public:
     void DrawToWindow(sf::RenderWindow& Render_Window) override;
 
     void SetBoostPercent( const float& Percent ) const;
+    void SetTrashCollectedAmount( const int& CurrentValue, const int& Max_Value );
 };

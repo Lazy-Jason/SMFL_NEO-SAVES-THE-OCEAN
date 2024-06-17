@@ -81,6 +81,5 @@ void LMenu_Hud::OnMouseButtonAction(sf::Mouse::Button MouseAction)
 
 void LMenu_Hud::OpenLevel()
 {
-    printf("Entering a new level");
     if(GEngine* Engine = &GEngine::GetInstance()) Engine->LoadLevel( new LFirstGame_Level() ); 
 }

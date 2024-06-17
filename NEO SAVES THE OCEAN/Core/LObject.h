@@ -2,8 +2,9 @@
 #include <iostream>
 #include <functional>
 #include <SFML/Graphics.hpp>
-#include "FunctionLibrary/LCoreStatic.h"
 #include "LazyWidgets/LazyEnvoyDeclaraction.h"
+
+class LCoreStatic;
 
 
 #define TEXTURE_PATH "C:\\\\Users\\\\hunti\\\\OneDrive\\\\Documents\\\\Cpp Projects\\\\NEO SAVES THE OCEAN\\\\Textures\\\\"
@@ -22,7 +23,6 @@ class LObject
     ///< The default font.
     sf::Font Default_Font;
 public:
- LazyEnvoy OnDestroy;
 protected:
  using CallbackFunction = std::function<void()>;
 public:
@@ -98,8 +98,6 @@ public:
     virtual void SetScale( const sf::Vector2f& Scale );
 
     sf::Font& GetDefaultFont() { return Default_Font; }
-
-    bool Destroy();
  
     /**
     * @brief Sets the font of the button text.

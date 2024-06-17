@@ -3,12 +3,13 @@
 LHealthStat::LHealthStat()
 {
     if (!HealthTexture.loadFromFile(TEXTURE_PATH "Heart.png")) return;
+
+    GetDefaultFont().loadFromFile(FONT_PATH "Dela_Gothic_One\\DelaGothicOne-Regular.ttf");
     InitHealthShape();
     SetHealthShapesTextures(&HealthTexture);
     HeathTextBlock.setFont(GetDefaultFont());
     HeathTextBlock.setString(HealthText_Content);
     HeathTextBlock.setCharacterSize(25);
-
     
     // Calculate the total width required for all health shapes
     const float totalWidth = (HealthTexture.getSize().x + HeathTextBlock.getScale().x) * HealthAmount + Horizontal_Spacing * (HealthAmount - 1);

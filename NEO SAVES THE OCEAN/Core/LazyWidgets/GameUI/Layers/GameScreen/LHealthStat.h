@@ -6,13 +6,13 @@ class LHealthStat : public LObject
     sf::Text HeathTextBlock;
     std::string HealthText_Content = "HP";
     std::vector<std::unique_ptr<sf::RectangleShape>> HeathShapes;
-    sf::Vector2i HealthShapeSize = {72, 50};
+    sf::Vector2i HealthShapeSize = {63, 48};
     sf::Texture HealthTexture;
     
     sf::RectangleShape StatBounds;
     int HealthAmount = 3;
 
-    float Horizontal_Spacing = 0.0f;
+    float Horizontal_Spacing = 5.0f;
     float Vertical_Spacing = 0.0f;
 public:
     LHealthStat();

@@ -1,4 +1,5 @@
 #include "LGame_LevelBase.h"
+#include "../../FunctionLibrary/LCoreStatic.h"
 #include "../../Player/LPlayableCharacterBase.h"
 #include "../../Primitive/Objects/LTrashCan.h"
 #include "..\..\Primitive\Collision.h"
@@ -17,8 +18,14 @@ void LGame_LevelBase::Init()
     PlayerSpawnParam.Location = {100, 900};
 
     PlayerCharacter = LCoreStatic::SpawnLObject<LPlayableCharacterBase>(PlayerSpawnParam);
-    PlayerCharacter->OnBoostAdded.AddEnvoy([this]() { UpdateBoostUI(); });
-    PlayerCharacter->OnBoostRemoved.AddEnvoy([this]() { UpdateBoostUI(); });
+
+    // Register the callbacks
+    if ( PlayerCharacter.lock() != nullptr ) // Lock the weak_ptr to get a shared_ptr
+    {
+        PlayerCharacter.lock()->OnBoostAdded.AddEnvoy([this]() { UpdateBoostUI(); });
+        PlayerCharacter.lock()->OnBoostRemoved.AddEnvoy([this]() { UpdateBoostUI(); });
+    }
+
     UpdateBoostUI();
     if(Collision::CreateTextureAndBitmask(Background_Texture, TEXTURE_PATH "Underwater background.png"))
     {
@@ -33,6 +40,7 @@ void LGame_LevelBase::Init()
 
     InitTrash();
     InitEnemies();
+    UpdateTrashCollectionUI();
 }
 
 void LGame_LevelBase::InitTrash()
@@ -42,6 +50,7 @@ void LGame_LevelBase::InitTrash()
         LObjectSpawnParameter Spawn_Parameter;
         Spawn_Parameter.Location = GetRandomLocationInWorldBounds();
         std::shared_ptr<LTrashCan> New_TrashCan = LCoreStatic::SpawnLObject<LTrashCan>(Spawn_Parameter);
+        New_TrashCan->OnTrashCollected.AddEnvoy([this]() { UpdateTrashCollection(); });
         AllTrashCan.push_back(New_TrashCan);
     }
 }
@@ -63,37 +72,37 @@ void LGame_LevelBase::OnMouseButtonAction(sf::Mouse::Button MouseAction)
 void LGame_LevelBase::OnKeyPressed(sf::Keyboard::Key InputKey)
 {
     if(GameHUD_Container != nullptr) GameHUD_Container->OnKeyPressed(InputKey);
-    if(PlayerCharacter != nullptr) PlayerCharacter->OnKeyPressed(InputKey);
+    if( PlayerCharacter.lock() ) PlayerCharacter.lock()->OnKeyPressed(InputKey);
 }
 
 void LGame_LevelBase::OnKeyReleased(sf::Keyboard::Key InputKey)
 {
     if(GameHUD_Container != nullptr) GameHUD_Container->OnKeyReleased(InputKey);
-    if(PlayerCharacter != nullptr) PlayerCharacter->OnKeyReleased(InputKey);
+    if( PlayerCharacter.lock() ) PlayerCharacter.lock()->OnKeyReleased(InputKey);
 }
 
-void LGame_LevelBase::HandleCollisionCheck() const
+void LGame_LevelBase::HandleCollisionCheck()
 {
-    if(PlayerCharacter == nullptr) return;
-    
+    RemoveTrash();
     for (const auto& element : AllTrashCan)
     {
-        if(element->GetCollisionComponent()->CheckCollision(PlayerCharacter->GetCollisionComponent()))
+        if(element.lock()->GetCollisionComponent()->CheckCollision(PlayerCharacter.lock()->GetCollisionComponent()))
         {
-            printf("Overlap begin \n");
-            element->OnCollisionBeginOverlap(PlayerCharacter->GetCollisionComponent());
+            element.lock()->EvaluateOverlap(PlayerCharacter.lock()->GetCollisionComponent());
         }
         else
         {
-            element->ReclaimOverlap();
+            element.lock()->ReclaimOverlap();
         }
     }
 }
 
 void LGame_LevelBase::HandleCameraAndPlayerPosition()
 {
+    if( PlayerCharacter.lock() == nullptr ) return;
+    
     // Update the camera view based on the player's position
-    const sf::Vector2f playerPosition = PlayerCharacter->GetPosition();
+    const sf::Vector2f playerPosition = PlayerCharacter.lock()->GetPosition();
     sf::Vector2f desiredViewCenter = playerPosition;
 
     // Clamp the desired view center within the level bounds
@@ -106,23 +115,23 @@ void LGame_LevelBase::HandleCameraAndPlayerPosition()
     CameraView.setCenter(desiredViewCenter);
 
     // Get the player's sprite dimensions
-    const sf::Vector2f playerSize = sf::Vector2f(PlayerCharacter->GetGlobalBounds().width, PlayerCharacter->GetGlobalBounds().height);
+    const sf::Vector2f playerSize = sf::Vector2f(PlayerCharacter.lock()->GetGlobalBounds().width, PlayerCharacter.lock()->GetGlobalBounds().height);
 
     // Clamp the player's position within the level bounds, considering their sprite size
-    sf::Vector2f clampedPlayerPosition = PlayerCharacter->GetPosition();
+    sf::Vector2f clampedPlayerPosition = PlayerCharacter.lock()->GetPosition();
     clampedPlayerPosition.x = std::max(clampedPlayerPosition.x, 0.0f);
     clampedPlayerPosition.x = std::min(clampedPlayerPosition.x, GameLevelInformation.LevelBound.x - playerSize.x);
     clampedPlayerPosition.y = std::max(clampedPlayerPosition.y, 0.0f);
     clampedPlayerPosition.y = std::min(clampedPlayerPosition.y, GameLevelInformation.LevelBound.y - playerSize.y);
 
     // Update the player's position with the clamped position
-    PlayerCharacter->SetPosition(clampedPlayerPosition);
+    PlayerCharacter.lock()->SetPosition(clampedPlayerPosition);
 }
 
 void LGame_LevelBase::Update(float Delta_Time)
 {
-    if (PlayerCharacter != nullptr) PlayerCharacter->Update(Delta_Time);
-    if (GameHUD_Container != nullptr) GameHUD_Container->Update(Delta_Time);
+    if( PlayerCharacter.lock() ) PlayerCharacter.lock()->Update(Delta_Time);
+    if(GameHUD_Container != nullptr) GameHUD_Container->Update(Delta_Time);
 
     HandleCollisionCheck();
     HandleCameraAndPlayerPosition();
@@ -133,11 +142,11 @@ void LGame_LevelBase::Render(sf::RenderWindow& window)
     window.setView(CameraView);
     window.draw(Background);
     window.draw(FinishLine_Shape);
-    for (const std::shared_ptr<LTrashCan>& element : AllTrashCan)
+    for (const auto& element : AllTrashCan)
     {
-        element->DrawToWindow(window);
+        if( element.lock() != nullptr ) element.lock()->DrawToWindow(window);
     }
-    if(PlayerCharacter != nullptr) PlayerCharacter->DrawToWindow(window);
+    if( PlayerCharacter.lock() ) PlayerCharacter.lock()->DrawToWindow(window);
 
     // UI Render
     window.setView(window.getDefaultView());
@@ -169,7 +178,8 @@ sf::Vector2f& LGame_LevelBase::GetRandomLocationInWorldBounds() const
         validLocation = true;
         for (const auto& trashCan : AllTrashCan)
         {
-            const float distance = std::sqrt(std::pow(NewLocation.x - trashCan->GetPosition().x, 2) + std::pow(NewLocation.y - trashCan->GetPosition().y, 2));
+            if(!trashCan.lock()) break;
+            const float distance = std::sqrt(std::pow(NewLocation.x - trashCan.lock()->GetPosition().x, 2) + std::pow(NewLocation.y - trashCan.lock()->GetPosition().y, 2));
             if (distance < GameLevelInformation.ObjectSpawnThreshold)
             {
                 validLocation = false;
@@ -181,9 +191,37 @@ sf::Vector2f& LGame_LevelBase::GetRandomLocationInWorldBounds() const
     return NewLocation;
 }
 
+void LGame_LevelBase::UpdateTrashCollection()
+{
+    if( PlayerCharacter.lock() == nullptr ) return;
+
+    PlayerCharacter.lock()->AddBoost(GameLevelInformation.BoostPerTrash_Collected);
+    GameLevelInformation.Trash_Collected ++;
+    UpdateTrashCollectionUI();
+}
+
+void LGame_LevelBase::UpdateTrashCollectionUI() const
+{
+    GameHUD_Container->SetTrashCollectedAmount
+    (GameLevelInformation.Trash_Collected, GameLevelInformation.Trash_Required);
+}
+
+void LGame_LevelBase::RemoveTrash()
+{
+    // Remove all null weak_ptr instances from AllTrashCan
+    std::erase_if
+    (
+        AllTrashCan,
+        [](const std::weak_ptr<LTrashCan>& weakPtr)
+        {
+            return weakPtr.expired();
+        }
+    );
+}
+
 void LGame_LevelBase::UpdateBoostUI() const
 {
-    if(PlayerCharacter == nullptr) return;
+    if( PlayerCharacter.lock() == nullptr ) return;
 
-    GameHUD_Container->SetBoostPercent(PlayerCharacter->GetBoostRatio());
+    GameHUD_Container->SetBoostPercent(PlayerCharacter.lock()->GetBoostRatio());
 }

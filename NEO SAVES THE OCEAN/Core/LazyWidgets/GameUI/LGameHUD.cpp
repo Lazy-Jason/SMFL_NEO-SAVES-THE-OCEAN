@@ -18,3 +18,8 @@ void LGameHUD::SetBoostPercent(const float& Percent) const
 {
     GameScreen->SetBoostPercent(Percent);
 }
+
+void LGameHUD::SetTrashCollectedAmount(const int& CurrentValue, const int& Max_Value)
+{
+    GameScreen->SetTrashCollectedAmount(CurrentValue, Max_Value);
+}
